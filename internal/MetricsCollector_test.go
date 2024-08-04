@@ -53,6 +53,10 @@ func TestAppendMetric(t *testing.T) {
 		metric1 := &data.Counter{Name: "metric1", Val: int64(10)}
 		err := AppendMetric(metric1, storages)
 
+		if err != nil {
+			t.Errorf("unexpected error: %v , cant add good metric", err)
+		}
+
 		metric2 := &data.Counter{Name: "metric1", Val: int64(20)}
 		err = AppendMetric(metric2, storages)
 
