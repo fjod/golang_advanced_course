@@ -43,7 +43,6 @@ func get(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusBadRequest, gin.H{"err": err})
-	return
 }
 
 func update(c *gin.Context) {
