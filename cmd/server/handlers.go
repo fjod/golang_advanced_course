@@ -42,7 +42,7 @@ func get(c *gin.Context) {
 		c.String(http.StatusOK, g)
 		return
 	}
-	c.JSON(http.StatusBadRequest, gin.H{"err": err})
+	c.JSON(http.StatusNotFound, gin.H{"err": err})
 }
 
 func update(c *gin.Context) {
