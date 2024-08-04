@@ -66,12 +66,12 @@ func (r *memStorage) Init() {
 }
 
 func (r *memStorage) KeyExists(k string) bool {
-	for gauge, _ := range r.gauges.data {
+	for gauge := range r.gauges.data {
 		if gauge.Name == k {
 			return true
 		}
 	}
-	for counter, _ := range r.counters.data {
+	for counter := range r.counters.data {
 		if counter.Name == k {
 			return true
 		}

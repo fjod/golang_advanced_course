@@ -10,18 +10,18 @@ import (
 )
 
 func SendMetrics() {
-	chg_10s := make(chan data.Gauge)
-	chc_10s := make(chan data.Counter)
+	chg10s := make(chan data.Gauge)
+	chc10s := make(chan data.Counter)
 	sleepDur := time.Duration(100) * time.Millisecond
-	go internal.CollectMetrics(2, chg_10s, chc_10s)
+	go internal.CollectMetrics(2, chg10s, chc10s)
 	for {
 		select {
-		case g := <-chg_10s:
+		case g := <-chg10s:
 
 			fmt.Println("отправка gauge ", g.GetName(), " ", g.GetValue())
 			send("gauge", g)
 
-		case c := <-chc_10s:
+		case c := <-chc10s:
 
 			fmt.Println("отправка counter ", c.GetName(), " ", c.GetValue())
 			send("counter", c)

@@ -10,22 +10,22 @@ import (
 var storages = make(map[int]Storage)
 var janitor = &sync.Mutex{}
 
-func CollectMetrics(pollInterval_2s int, chg_10s chan<- internal.Gauge, chc_10s chan<- internal.Counter) {
-	chg_2s := make(chan internal.Gauge)
-	chc_2s := make(chan internal.Counter)
+func CollectMetrics(pollinterval2s int, chg10s chan<- internal.Gauge, chc10s chan<- internal.Counter) {
+	chg2s := make(chan internal.Gauge)
+	chc2s := make(chan internal.Counter)
 	st := NewStorage()
 	storages[len(storages)] = *st
 	ticker10 := time.NewTicker(10 * time.Second)
 	ticker60 := time.NewTicker(60 * time.Second)
-	go Monitor(pollInterval_2s, chg_2s, chc_2s)
+	go Monitor(pollinterval2s, chg2s, chc2s)
 	for {
 		select {
-		case g := <-chg_2s:
+		case g := <-chg2s:
 			err := AppendMetric(g, storages)
 			if err != nil {
 				return
 			}
-		case c := <-chc_2s:
+		case c := <-chc2s:
 			err := AppendMetric(c, storages)
 			if err != nil {
 				return
@@ -38,11 +38,11 @@ func CollectMetrics(pollInterval_2s int, chg_10s chan<- internal.Gauge, chc_10s 
 				for _, s := range storages {
 					for g := range s.StorageOperations.gauges.data {
 						s.StorageOperations.gauges.data[g] = false
-						chg_10s <- g
+						chg10s <- g
 					}
 					for c := range s.StorageOperations.counters.data {
 						s.StorageOperations.counters.data[c] = false
-						chc_10s <- c
+						chc10s <- c
 					}
 				}
 				janitor.Unlock()
