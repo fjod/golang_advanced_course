@@ -93,3 +93,11 @@ func AppendMetric(c internal.IMetric, s map[int]Storage) error {
 	}
 	return nil
 }
+
+func SaveMetric(c internal.IMetric, s Storage) error {
+	err := s.StorageOperations.AddOrEdit(c.GetValue(), c.GetName())
+	if err != nil {
+		return err
+	}
+	return nil
+}
