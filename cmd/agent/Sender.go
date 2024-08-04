@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fjod/golang_advanced_course/internal"
 	data "github.com/fjod/golang_advanced_course/internal/Data"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -34,8 +35,14 @@ func SendMetrics() {
 
 func send(name string, m data.IMetric) {
 	s := fmt.Sprintf("http://localhost:8080/update/%v/%v/%v", name, m.GetName(), m.GetValue())
-	_, err := http.Post(s, "text/plain", strings.NewReader(""))
+	resp, err := http.Post(s, "text/plain", strings.NewReader(""))
 	if err != nil {
 		fmt.Println(err)
 	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(resp.Body)
 }
