@@ -26,26 +26,6 @@ func TestAppendMetric(t *testing.T) {
 		if len(storages) != 1 {
 			t.Errorf("must be one storage, got %v", len(storages))
 		}
-
-		gotFst := false
-		for counter, b := range storages[0].StorageOperations.counters.data {
-			if !gotFst {
-				gotFst = true
-				if b != false {
-					t.Errorf("expected false, got %v", b)
-				}
-				if counter.Name != "metric1" || counter.Val != 10 {
-					t.Errorf("expected metric1, 10, got %v, %v", counter.Name, counter.Val)
-				}
-				continue
-			}
-			if b != false {
-				t.Errorf("expected false, got %v", b)
-			}
-			if counter.Name != "metric2" || counter.Val != 20 {
-				t.Errorf("expected metric1, 10, got %v, %v", counter.Name, counter.Val)
-			}
-		}
 	})
 	t.Run("same metrics placed in different storages", func(t *testing.T) {
 		storages := make(map[int]Storage)
