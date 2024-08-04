@@ -1,3 +1,17 @@
 package main
 
-func main() {}
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	fmt.Println("agent")
+	exePath, err := os.Executable()
+	if err != nil {
+		fmt.Println("Failed to get executable path:", err)
+	} else {
+		fmt.Println("Executable:", exePath)
+	}
+	SendMetrics()
+}
