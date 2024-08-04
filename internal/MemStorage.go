@@ -87,8 +87,8 @@ func (r *memStorage) AddOrEdit(any interface{}, name string) error {
 	if ok {
 		for counter := range r.counters.data {
 			if counter.Name == name {
-				counter.Val += cval
 				delete(r.counters.data, counter)
+				counter.Val += cval
 				r.counters.data[counter] = false
 				return nil
 			}
@@ -105,8 +105,8 @@ func (r *memStorage) AddOrEdit(any interface{}, name string) error {
 	if ok {
 		for gauge := range r.gauges.data {
 			if gauge.Name == name {
-				gauge.Val = fval
 				delete(r.gauges.data, gauge)
+				gauge.Val = fval
 				r.gauges.data[gauge] = false
 				return nil
 			}
