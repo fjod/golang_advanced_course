@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/fjod/golang_advanced_course/internal"
+	data "github.com/fjod/golang_advanced_course/internal/Data"
 	"net/http"
 	"strings"
 	"time"
 )
-import data "github.com/fjod/golang_advanced_course/internal/Data"
 
 func SendMetrics() {
 	chg_10s := make(chan data.Gauge)
