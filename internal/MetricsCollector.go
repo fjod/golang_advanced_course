@@ -36,12 +36,12 @@ func CollectMetrics(pollinterval2s int, chg10s chan<- internal.Gauge, chc10s cha
 				fmt.Println("отправка метрик из CollectMetrics")
 				// отправляем все что насобирали
 				for _, s := range storages {
-					for g := range s.StorageOperations.gauges.data {
-						s.StorageOperations.gauges.data[g] = false
+					for _, g := range s.StorageOperations.gauges.data {
+						g.State = internal.Sent
 						chg10s <- g
 					}
-					for c := range s.StorageOperations.counters.data {
-						s.StorageOperations.counters.data[c] = false
+					for _, c := range s.StorageOperations.counters.data {
+						c.State = internal.Sent
 						chc10s <- c
 					}
 				}
@@ -63,7 +63,7 @@ func Clean(s *map[int]Storage) {
 		for _, b := range storage.StorageOperations.gauges.data {
 			// удаляем весь набор метрик, если хотя бы одну из них уже отправили
 			// все метрики не проверяются из-за мютекса
-			if b {
+			if b.GetStatus() == internal.Sent {
 				delete(*s, i)
 			}
 			break

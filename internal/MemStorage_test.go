@@ -8,8 +8,8 @@ import (
 
 func TestMemStorageAdd(t *testing.T) {
 	storage := &memStorage{
-		counters: counterStorage{data: make(map[internal.Counter]bool)},
-		gauges:   gaugeStorage{data: make(map[internal.Gauge]bool)},
+		counters: counterStorage{data: make(map[string]internal.Counter)},
+		gauges:   gaugeStorage{data: make(map[string]internal.Gauge)},
 	}
 
 	t.Run("add counter", func(t *testing.T) {
@@ -18,11 +18,9 @@ func TestMemStorageAdd(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		counter, ok := storage.counters.data[internal.Counter{Name: "test_counter", Val: 42}]
+		_, ok := storage.counters.data["test_counter"]
 		if !ok {
 			t.Error("counter not found in storage")
-		} else if counter {
-			t.Error("counter value should be false")
 		}
 	})
 
@@ -32,11 +30,9 @@ func TestMemStorageAdd(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		gauge, ok := storage.gauges.data[internal.Gauge{Name: "test_gauge", Val: 3.14}]
+		_, ok := storage.gauges.data["test_gauge"]
 		if !ok {
 			t.Error("gauge not found in storage")
-		} else if gauge {
-			t.Error("gauge value should be false")
 		}
 	})
 
@@ -50,19 +46,19 @@ func TestMemStorageAdd(t *testing.T) {
 
 func TestMemStorageKeyExists(t *testing.T) {
 	storage := &memStorage{
-		counters: counterStorage{data: make(map[internal.Counter]bool)},
-		gauges:   gaugeStorage{data: make(map[internal.Gauge]bool)},
+		counters: counterStorage{data: make(map[string]internal.Counter)},
+		gauges:   gaugeStorage{data: make(map[string]internal.Gauge)},
 	}
 
 	t.Run("key exists in counters", func(t *testing.T) {
-		storage.counters.data[internal.Counter{Name: "test_counter", Val: 42}] = false
+		storage.counters.data["test_counter"] = internal.Counter{Name: "test_counter", Val: 42, State: internal.NotSent}
 		if !storage.KeyExists("test_counter") {
 			t.Error("expected key to exist in counters")
 		}
 	})
 
 	t.Run("key exists in gauges", func(t *testing.T) {
-		storage.gauges.data[internal.Gauge{Name: "test_gauge", Val: 3.14}] = false
+		storage.gauges.data["test_gauge"] = internal.Gauge{Name: "test_gauge", Val: 3.14, State: internal.NotSent}
 		if !storage.KeyExists("test_gauge") {
 			t.Error("expected key to exist in gauges")
 		}
@@ -76,8 +72,8 @@ func TestMemStorageKeyExists(t *testing.T) {
 
 	t.Run("empty storage", func(t *testing.T) {
 		emptyStorage := &memStorage{
-			counters: counterStorage{data: make(map[internal.Counter]bool)},
-			gauges:   gaugeStorage{data: make(map[internal.Gauge]bool)},
+			counters: counterStorage{data: make(map[string]internal.Counter)},
+			gauges:   gaugeStorage{data: make(map[string]internal.Gauge)},
 		}
 		if emptyStorage.KeyExists("any_key") {
 			t.Error("expected key to not exist in empty storage")
@@ -87,8 +83,8 @@ func TestMemStorageKeyExists(t *testing.T) {
 
 func TestMemStorageAddOrEdit(t *testing.T) {
 	storage := &memStorage{
-		counters: counterStorage{data: make(map[internal.Counter]bool)},
-		gauges:   gaugeStorage{data: make(map[internal.Gauge]bool)},
+		counters: counterStorage{data: make(map[string]internal.Counter)},
+		gauges:   gaugeStorage{data: make(map[string]internal.Gauge)},
 	}
 
 	t.Run("add new counter", func(t *testing.T) {
@@ -97,25 +93,23 @@ func TestMemStorageAddOrEdit(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		counter, ok := storage.counters.data[internal.Counter{Name: "new_counter", Val: 42}]
+		_, ok := storage.counters.data["new_counter"]
 		if !ok {
 			t.Error("counter not found in storage")
-		} else if counter {
-			t.Error("counter value should be false")
 		}
 	})
 
 	t.Run("edit existing counter", func(t *testing.T) {
-		storage.counters.data[internal.Counter{Name: "existing_counter", Val: 10}] = false
+		storage.counters.data["existing_counter"] = internal.Counter{Name: "existing_counter", Val: 10, State: internal.NotSent}
 		err := storage.AddOrEdit(int64(5), "existing_counter")
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		counter, ok := storage.counters.data[internal.Counter{Name: "existing_counter", Val: 15}]
+		counter, ok := storage.counters.data["existing_counter"]
 		if !ok {
 			t.Error("counter not found in storage")
-		} else if counter {
+		} else if counter.Val != 15 {
 			t.Error("counter value should be false")
 		}
 	})
@@ -126,25 +120,23 @@ func TestMemStorageAddOrEdit(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		gauge, ok := storage.gauges.data[internal.Gauge{Name: "new_gauge", Val: 3.14}]
+		_, ok := storage.gauges.data["new_gauge"]
 		if !ok {
 			t.Error("gauge not found in storage")
-		} else if gauge {
-			t.Error("gauge value should be false")
 		}
 	})
 
 	t.Run("edit existing gauge", func(t *testing.T) {
-		storage.gauges.data[internal.Gauge{Name: "existing_gauge", Val: 10.0}] = false
+		storage.gauges.data["existing_gauge"] = internal.Gauge{Name: "existing_gauge", Val: 10.0, State: internal.NotSent}
 		err := storage.AddOrEdit(5.0, "existing_gauge")
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		gauge, ok := storage.gauges.data[internal.Gauge{Name: "existing_gauge", Val: 5.0}]
+		gauge, ok := storage.gauges.data["existing_gauge"]
 		if !ok {
 			t.Error("gauge not found in storage")
-		} else if gauge {
+		} else if gauge.Val != 5.0 {
 			t.Error("gauge value should be false")
 		}
 	})
@@ -159,11 +151,11 @@ func TestMemStorageAddOrEdit(t *testing.T) {
 
 func TestMemStorageGetValue(t *testing.T) {
 	storage := &memStorage{
-		counters: counterStorage{data: map[internal.Counter]bool{
-			{Name: "test_counter", Val: 42}: false,
+		counters: counterStorage{data: map[string]internal.Counter{
+			"test_counter": {Name: "existing_counter", Val: 42, State: internal.NotSent},
 		}},
-		gauges: gaugeStorage{data: map[internal.Gauge]bool{
-			{Name: "test_gauge", Val: 3.14}: false,
+		gauges: gaugeStorage{data: map[string]internal.Gauge{
+			"test_gauge": {Name: "existing_gauge", Val: 3.14, State: internal.NotSent},
 		}},
 	}
 
@@ -203,8 +195,8 @@ func TestMemStorageGetValue(t *testing.T) {
 
 	t.Run("empty storage", func(t *testing.T) {
 		emptyStorage := &memStorage{
-			counters: counterStorage{data: make(map[internal.Counter]bool)},
-			gauges:   gaugeStorage{data: make(map[internal.Gauge]bool)},
+			counters: counterStorage{data: make(map[string]internal.Counter)},
+			gauges:   gaugeStorage{data: make(map[string]internal.Gauge)},
 		}
 		_, err := emptyStorage.GetValue("any_key", "counter")
 		if err == nil {
@@ -216,8 +208,8 @@ func TestMemStorageGetValue(t *testing.T) {
 func TestMemStoragePrint(t *testing.T) {
 	t.Run("empty storage", func(t *testing.T) {
 		storage := &memStorage{
-			counters: counterStorage{data: make(map[internal.Counter]bool)},
-			gauges:   gaugeStorage{data: make(map[internal.Gauge]bool)},
+			counters: counterStorage{data: make(map[string]internal.Counter)},
+			gauges:   gaugeStorage{data: make(map[string]internal.Gauge)},
 		}
 		result := storage.Print()
 		if len(result) != 0 {
@@ -227,13 +219,13 @@ func TestMemStoragePrint(t *testing.T) {
 
 	t.Run("non-empty storage", func(t *testing.T) {
 		storage := &memStorage{
-			counters: counterStorage{data: map[internal.Counter]bool{
-				{Name: "counter1", Val: 42}:  false,
-				{Name: "counter2", Val: 100}: false,
+			counters: counterStorage{data: map[string]internal.Counter{
+				"counter1": {Name: "counter1", Val: 42, State: internal.NotSent},
+				"counter2": {Name: "counter1", Val: 100, State: internal.NotSent},
 			}},
-			gauges: gaugeStorage{data: map[internal.Gauge]bool{
-				{Name: "gauge1", Val: 3.14}: false,
-				{Name: "gauge2", Val: 10.0}: false,
+			gauges: gaugeStorage{data: map[string]internal.Gauge{
+				"gauge1": {Name: "counter1", Val: 3.14, State: internal.NotSent},
+				"gauge2": {Name: "counter1", Val: 10.0, State: internal.NotSent},
 			}},
 		}
 		expected := map[string]string{

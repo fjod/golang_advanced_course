@@ -4,27 +4,37 @@ import (
 	"runtime"
 )
 
+type Status byte
+
+const (
+	Sent    Status = 0
+	NotSent Status = 1
+)
+
 type IMetric interface {
-	GetName() string
+	GetStatus() Status
 	GetValue() any
+	GetName() string
 }
 
 type Gauge struct {
-	Name string
-	Val  float64
+	State Status
+	Val   float64
+	Name  string
 }
 
 type Counter struct {
-	Name string
-	Val  int64
+	State Status
+	Val   int64
+	Name  string
 }
 
-func (g Gauge) GetName() string {
-	return g.Name
+func (g Gauge) GetStatus() Status {
+	return g.State
 }
 
-func (c Counter) GetName() string {
-	return c.Name
+func (c Counter) GetStatus() Status {
+	return c.State
 }
 
 func (g Gauge) GetValue() any {
@@ -33,6 +43,14 @@ func (g Gauge) GetValue() any {
 
 func (c Counter) GetValue() any {
 	return c.Val
+}
+
+func (g Gauge) GetName() string {
+	return g.Name
+}
+
+func (c Counter) GetName() string {
+	return c.Name
 }
 
 type GetAndSend func(string, runtime.MemStats, chan<- Gauge)

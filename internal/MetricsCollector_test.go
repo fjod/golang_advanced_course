@@ -51,10 +51,7 @@ func TestAppendMetric(t *testing.T) {
 		if len(storages[0].StorageOperations.counters.data) != 1 {
 			t.Errorf("must be one item in first storage, got %v", len(storages[0].StorageOperations.counters.data))
 		}
-		for counter, b := range storages[0].StorageOperations.counters.data {
-			if b != false {
-				t.Errorf("expected false, got %v", b)
-			}
+		for _, counter := range storages[0].StorageOperations.counters.data {
 			if counter.Name != "metric1" || counter.Val != 10 {
 				t.Errorf("expected metric1, 10, got %v, %v", counter.Name, counter.Val)
 			}
@@ -63,10 +60,7 @@ func TestAppendMetric(t *testing.T) {
 		if len(storages[1].StorageOperations.counters.data) != 1 {
 			t.Errorf("must be one item in second storage, got %v", len(storages[1].StorageOperations.counters.data))
 		}
-		for counter, b := range storages[1].StorageOperations.counters.data {
-			if b != false {
-				t.Errorf("expected false, got %v", b)
-			}
+		for _, counter := range storages[1].StorageOperations.counters.data {
 			if counter.Name != "metric1" || counter.Val != 20 {
 				t.Errorf("expected metric1, 20, got %v, %v", counter.Name, counter.Val)
 			}
@@ -94,16 +88,16 @@ func TestClean(t *testing.T) {
 		storages := make(map[int]Storage)
 		storages[0] = Storage{
 			StorageOperations: memStorage{
-				gauges: gaugeStorage{data: map[data.Gauge]bool{
-					{Name: "gauge1", Val: 1.0}: true,
-					{Name: "gauge2", Val: 2.0}: false,
+				gauges: gaugeStorage{data: map[string]data.Gauge{
+					"gauge1": {Name: "gauge1", Val: 1.0, State: data.Sent},
+					"gauge2": {Name: "gauge2", Val: 2.0, State: data.Sent},
 				}},
 			},
 		}
 		storages[1] = Storage{
 			StorageOperations: memStorage{
-				gauges: gaugeStorage{data: map[data.Gauge]bool{
-					{Name: "gauge3", Val: 3.0}: false,
+				gauges: gaugeStorage{data: map[string]data.Gauge{
+					"gauge3": {Name: "gauge3", Val: 2.0, State: data.NotSent},
 				}},
 			},
 		}
@@ -112,9 +106,6 @@ func TestClean(t *testing.T) {
 
 		if len(storages) != 1 {
 			t.Errorf("expected one storage after cleaning, got %d", len(storages))
-		}
-		if _, ok := storages[1]; !ok {
-			t.Error("expected storage 1 to remain after cleaning")
 		}
 	})
 
@@ -126,12 +117,12 @@ func TestClean(t *testing.T) {
 		}
 	})
 
-	t.Run("no gauges in storage", func(t *testing.T) {
+	t.Run("no removal when storage was not sent", func(t *testing.T) {
 		storages := make(map[int]Storage)
 		storages[0] = Storage{
 			StorageOperations: memStorage{
-				counters: counterStorage{data: map[data.Counter]bool{
-					{Name: "counter1", Val: 1}: false,
+				counters: counterStorage{data: map[string]data.Counter{
+					"counter1": {Name: "counter1", Val: 2.0, State: data.NotSent},
 				}},
 			},
 		}

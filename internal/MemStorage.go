@@ -23,11 +23,11 @@ type memStorage struct {
 }
 
 type counterStorage struct {
-	data map[internal.Counter]bool
+	data map[string]internal.Counter
 }
 
 type gaugeStorage struct {
-	data map[internal.Gauge]bool
+	data map[string]internal.Gauge
 }
 
 type StorageOperations interface {
@@ -43,10 +43,11 @@ func (r *memStorage) Add(any interface{}, name string) error {
 	_, ok := any.(int64)
 	if ok {
 		c := &internal.Counter{
-			Name: name,
-			Val:  any.(int64),
+			Name:  name,
+			Val:   any.(int64),
+			State: internal.NotSent,
 		}
-		r.counters.data[*c] = false
+		r.counters.data[name] = *c
 		return nil
 	}
 	_, ok = any.(float64)
@@ -55,7 +56,7 @@ func (r *memStorage) Add(any interface{}, name string) error {
 			Name: name,
 			Val:  any.(float64),
 		}
-		r.gauges.data[*g] = false
+		r.gauges.data[name] = *g
 		return nil
 	}
 
@@ -64,18 +65,18 @@ func (r *memStorage) Add(any interface{}, name string) error {
 }
 
 func (r *memStorage) Init() {
-	r.gauges.data = make(map[internal.Gauge]bool)
-	r.counters.data = make(map[internal.Counter]bool)
+	r.gauges.data = make(map[string]internal.Gauge)
+	r.counters.data = make(map[string]internal.Counter)
 }
 
 func (r *memStorage) KeyExists(k string) bool {
 	for gauge := range r.gauges.data {
-		if gauge.Name == k {
+		if gauge == k {
 			return true
 		}
 	}
 	for counter := range r.counters.data {
-		if counter.Name == k {
+		if counter == k {
 			return true
 		}
 	}
@@ -85,37 +86,38 @@ func (r *memStorage) KeyExists(k string) bool {
 func (r *memStorage) AddOrEdit(any interface{}, name string) error {
 	cval, ok := any.(int64)
 	if ok {
-		for counter := range r.counters.data {
-			if counter.Name == name {
-				delete(r.counters.data, counter)
-				counter.Val += cval
-				r.counters.data[counter] = false
-				return nil
-			}
+		counter, counterFound := r.counters.data[name]
+		if counterFound {
+			delete(r.counters.data, name)
+			counter.Val += cval
+			counter.State = internal.NotSent
+			r.counters.data[name] = counter
+			return nil
 		}
 		c := &internal.Counter{
-			Name: name,
-			Val:  cval,
+			Name:  name,
+			Val:   cval,
+			State: internal.NotSent,
 		}
-		r.counters.data[*c] = false
+		r.counters.data[name] = *c
 		return nil
 	}
-
 	fval, ok := any.(float64)
 	if ok {
-		for gauge := range r.gauges.data {
-			if gauge.Name == name {
-				delete(r.gauges.data, gauge)
-				gauge.Val = fval
-				r.gauges.data[gauge] = false
-				return nil
-			}
+		gauge, gaugeFound := r.gauges.data[name]
+		if gaugeFound {
+			delete(r.gauges.data, name)
+			gauge.Val = fval
+			gauge.State = internal.NotSent
+			r.gauges.data[name] = gauge
+			return nil
 		}
+
 		g := &internal.Gauge{
 			Name: name,
 			Val:  fval,
 		}
-		r.gauges.data[*g] = false
+		r.gauges.data[name] = *g
 		return nil
 	}
 
@@ -125,16 +127,14 @@ func (r *memStorage) AddOrEdit(any interface{}, name string) error {
 
 func (r *memStorage) GetValue(name string, metricType string) (string, error) {
 	if metricType == "counter" {
-		for counter := range r.counters.data {
-			if counter.Name == name {
-				return fmt.Sprintf("%v", counter.Val), nil
-			}
+		c, ok := r.counters.data[name]
+		if ok {
+			return fmt.Sprintf("%v", c.Val), nil
 		}
 	} else if metricType == "gauge" {
-		for gauge := range r.gauges.data {
-			if gauge.Name == name {
-				return fmt.Sprintf("%v", gauge.Val), nil
-			}
+		g, ok := r.gauges.data[name]
+		if ok {
+			return fmt.Sprintf("%v", g.Val), nil
 		}
 	}
 	err := fmt.Errorf("key not found or not supported type")
@@ -143,11 +143,11 @@ func (r *memStorage) GetValue(name string, metricType string) (string, error) {
 
 func (r *memStorage) Print() map[string]string {
 	ret := make(map[string]string)
-	for gauge := range r.gauges.data {
-		ret[gauge.Name] = fmt.Sprintf("%v", gauge.Val)
+	for gName, gauge := range r.gauges.data {
+		ret[gName] = fmt.Sprintf("%v", gauge.Val)
 	}
-	for counter := range r.counters.data {
-		ret[counter.Name] = fmt.Sprintf("%v", counter.Val)
+	for cName, counter := range r.counters.data {
+		ret[cName] = fmt.Sprintf("%v", counter.Val)
 	}
 	return ret
 }
