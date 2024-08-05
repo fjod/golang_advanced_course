@@ -6,7 +6,6 @@ import (
 )
 
 func main() {
-	fmt.Println("agent")
 	exePath, err := os.Executable()
 	if err != nil {
 		fmt.Println("Failed to get executable path:", err)
@@ -15,5 +14,6 @@ func main() {
 	}
 
 	server, reportInterval, pollInterval := GetConfigValues()
+	fmt.Println("agent запущен на ", server)
 	SendMetrics(server, reportInterval, pollInterval)
 }
