@@ -10,12 +10,12 @@ import (
 var storages = make(map[int]Storage)
 var janitor = &sync.Mutex{}
 
-func CollectMetrics(pollinterval2s int, chg10s chan<- internal.Gauge, chc10s chan<- internal.Counter) {
+func CollectMetrics(pollinterval2s int, reportiInterval10s int, chg10s chan<- internal.Gauge, chc10s chan<- internal.Counter) {
 	chg2s := make(chan internal.Gauge)
 	chc2s := make(chan internal.Counter)
 	st := NewStorage()
 	storages[len(storages)] = *st
-	ticker10 := time.NewTicker(10 * time.Second)
+	ticker10 := time.NewTicker(time.Duration(reportiInterval10s) * time.Second)
 	ticker60 := time.NewTicker(60 * time.Second)
 	go Monitor(pollinterval2s, chg2s, chc2s)
 	for {
