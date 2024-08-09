@@ -1,4 +1,4 @@
-package main
+package Handlers
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func html(c *gin.Context) {
+func Html(c *gin.Context, storage internal.StorageOperations) {
 	t, err := template.New("map").Parse(`
 <html>
 <body>
@@ -27,17 +27,17 @@ func html(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	err = t.Execute(c.Writer, storage.StorageOperations.Print())
+	err = t.Execute(c.Writer, storage.Print())
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 }
 
-func get(c *gin.Context) {
+func Get(c *gin.Context, storage internal.StorageOperations) {
 	metricType := c.Param("type")
 	name := c.Param("name")
-	g, err := storage.StorageOperations.GetValue(name, metricType)
+	g, err := storage.GetValue(name, metricType)
 	if err == nil {
 		c.String(http.StatusOK, g)
 		return
@@ -45,7 +45,7 @@ func get(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{"err": err})
 }
 
-func update(c *gin.Context) {
+func Update(c *gin.Context, storage internal.StorageOperations) {
 	metricType := c.Param("type")
 	if metricType == "gauge" {
 		n, err := strconv.ParseFloat(c.Param("value"), 64)
@@ -54,7 +54,7 @@ func update(c *gin.Context) {
 				Name: c.Param("name"),
 				Val:  n,
 			}
-			err = internal.SaveMetric(g, *storage)
+			err = internal.SaveMetric(g, storage)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"err": err})
 				return
@@ -74,7 +74,7 @@ func update(c *gin.Context) {
 				Name: c.Param("name"),
 				Val:  n,
 			}
-			err = internal.SaveMetric(g, *storage)
+			err = internal.SaveMetric(g, storage)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"err": err})
 				return
