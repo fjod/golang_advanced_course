@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/fjod/golang_advanced_course/internal"
-	"github.com/fjod/golang_advanced_course/internal/handlers"
 	"github.com/gin-gonic/gin"
 	"os"
 )
@@ -21,13 +20,13 @@ func main() {
 	}
 	router := gin.Default()
 	router.POST("/update/:type/:name/:value", func(context *gin.Context) {
-		handlers.Update(context, &storage.StorageOperations)
+		internal.Update(context, &storage.StorageOperations)
 	})
 	router.GET("/value/:type/:name", func(context *gin.Context) {
-		handlers.Get(context, &storage.StorageOperations)
+		internal.Get(context, &storage.StorageOperations)
 	})
 	router.GET("", func(context *gin.Context) {
-		handlers.HTML(context, &storage.StorageOperations)
+		internal.HTML(context, &storage.StorageOperations)
 	})
 	err = router.Run(server)
 	if err != nil {
