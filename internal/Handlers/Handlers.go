@@ -1,4 +1,4 @@
-package Handlers
+package handlers
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func Html(c *gin.Context, storage internal.StorageOperations) {
+func HTML(c *gin.Context, storage internal.StorageOperations) {
 	t, err := template.New("map").Parse(`
 <html>
 <body>
