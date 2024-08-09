@@ -27,7 +27,7 @@ func main() {
 		H.Get(context, &storage.StorageOperations)
 	})
 	router.GET("", func(context *gin.Context) {
-		H.Html(context, &storage.StorageOperations)
+		H.HTML(context, &storage.StorageOperations)
 	})
 	err = router.Run(server)
 	if err != nil {
