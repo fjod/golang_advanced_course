@@ -3,13 +3,19 @@ package main
 import (
 	"fmt"
 	"github.com/fjod/golang_advanced_course/internal"
+	MW "github.com/fjod/golang_advanced_course/internal/Middlewares"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"os"
 )
 
 var storage = internal.NewStorage()
+var sugar zap.SugaredLogger
 
 func main() {
+
+	CreateLogger()
+
 	server := GetConfigValues()
 	fmt.Println("server запущен на ", server)
 	exePath, err := os.Executable()
@@ -19,6 +25,13 @@ func main() {
 		fmt.Println("Executable:", exePath)
 	}
 	router := gin.Default()
+
+	// Сведения о запросах должны содержать URI, метод запроса и время, затраченное на его выполнение.
+	router.Use(MW.RequestLogger(sugar))
+
+	// Сведения об ответах должны содержать код статуса и размер содержимого ответа.
+	router.Use(MW.ResponseLogger(sugar))
+
 	router.POST("/update/:type/:name/:value", func(context *gin.Context) {
 		internal.Update(context, &storage.StorageOperations)
 	})
@@ -33,4 +46,19 @@ func main() {
 		fmt.Println("router dead", err)
 		return
 	}
+}
+
+func CreateLogger() {
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		panic(err)
+	}
+	defer func(logger *zap.Logger) {
+		err := logger.Sync()
+		if err != nil {
+			fmt.Println("zap logger sync error", err)
+		}
+	}(logger)
+
+	sugar = *logger.Sugar()
 }
