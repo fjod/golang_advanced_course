@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/fjod/golang_advanced_course/internal"
-	MW "github.com/fjod/golang_advanced_course/internal/Middlewares"
+	MW "github.com/fjod/golang_advanced_course/internal/middlewares"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"os"
