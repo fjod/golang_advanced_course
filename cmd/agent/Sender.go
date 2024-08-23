@@ -66,9 +66,10 @@ func send(m data.IMetric, server string) {
 		janitor.Unlock()
 		return
 	}
-	fmt.Printf("ошибка Close %v", code)
+
 	err = resp.Body.Close()
 	if err != nil {
+		fmt.Printf("ошибка Close %v", code)
 		fmt.Println(err, code)
 	}
 	janitor.Unlock()

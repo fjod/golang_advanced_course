@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 )
 
 func main() {
+	time.Sleep(10 * time.Second)
 	exePath, err := os.Executable()
 	if err != nil {
 		fmt.Println("Failed to get executable path:", err)
