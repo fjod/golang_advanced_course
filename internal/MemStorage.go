@@ -148,7 +148,7 @@ func (r *memStorage) GetJSONValue(name string, metricType string) (internal.Metr
 		if ok {
 			return internal.Metrics{
 				ID:    c.Name,
-				Delta: &c.Val,
+				Delta: c.Val,
 				MType: "counter",
 			}, nil
 		}
@@ -157,7 +157,7 @@ func (r *memStorage) GetJSONValue(name string, metricType string) (internal.Metr
 		if ok {
 			return internal.Metrics{
 				ID:    g.Name,
-				Value: &g.Val,
+				Value: g.Val,
 				MType: "gauge",
 			}, nil
 		}

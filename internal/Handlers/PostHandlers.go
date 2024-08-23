@@ -27,7 +27,7 @@ func jsonUpdate(c *gin.Context, storage internal.StorageOperations) {
 		if metricType == "gauge" {
 			g := data.Gauge{
 				Name: d.ID,
-				Val:  *d.Value,
+				Val:  d.Value,
 			}
 			err = internal.SaveMetric(g, storage)
 			if err != nil {
@@ -43,7 +43,7 @@ func jsonUpdate(c *gin.Context, storage internal.StorageOperations) {
 		if metricType == "counter" {
 			g := data.Counter{
 				Name: d.ID,
-				Val:  *d.Delta,
+				Val:  d.Delta,
 			}
 			err = internal.SaveMetric(g, storage)
 			if err != nil {

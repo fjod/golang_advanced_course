@@ -55,18 +55,20 @@ func (c Counter) GetName() string {
 }
 
 func (g Gauge) ToJSON() Metrics {
-	return Metrics{
+	var ret = Metrics{
 		ID:    g.Name,
-		Value: &g.Val,
+		Value: g.Val,
 		MType: "gauge",
 	}
+	return ret
 }
 func (c Counter) ToJSON() Metrics {
-	return Metrics{
+	var ret = Metrics{
 		ID:    c.Name,
-		Delta: &c.Val,
+		Delta: c.Val,
 		MType: "counter",
 	}
+	return ret
 }
 
 type GetAndSend func(string, runtime.MemStats, chan<- Gauge)
