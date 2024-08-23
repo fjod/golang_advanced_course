@@ -54,6 +54,8 @@ func GetJSON(c *gin.Context, storage internal.StorageOperations) {
 	}
 	g, err := storage.GetJSONValue(d.ID, d.MType)
 	if err != nil {
+		fmt.Println(d)
+		fmt.Println(g)
 		c.JSON(http.StatusAlreadyReported, gin.H{"err": err})
 		return
 	}
