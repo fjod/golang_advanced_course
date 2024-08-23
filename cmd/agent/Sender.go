@@ -37,12 +37,16 @@ func send(m data.IMetric, server string) {
 	fmt.Printf("пробуем что-то отправить %v\n", j)
 	jsonData, err := json.Marshal(j)
 	if err != nil {
+		fmt.Printf("ошибка жсон")
 		fmt.Println(err)
 	}
+	fmt.Printf("отправляю")
 	resp, err := http.Post(s, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
+		fmt.Printf("ошибка1")
 		fmt.Println(err)
 	}
+	fmt.Printf("закрываю")
 	err = resp.Body.Close()
 	if err != nil {
 		fmt.Println(err)
