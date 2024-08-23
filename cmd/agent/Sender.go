@@ -7,8 +7,11 @@ import (
 	"github.com/fjod/golang_advanced_course/internal"
 	data "github.com/fjod/golang_advanced_course/internal/Data"
 	"net/http"
+	"sync"
 	"time"
 )
+
+var janitor = &sync.Mutex{}
 
 func SendMetrics(server string, reportInterval int, pollInterval int) {
 	chg10s := make(chan data.Gauge, 1)
@@ -32,6 +35,7 @@ func SendMetrics(server string, reportInterval int, pollInterval int) {
 }
 
 func send(m data.IMetric, server string) {
+	janitor.Lock()
 	s := fmt.Sprintf("http://%v/update/", server)
 	var j = m.ToJSON()
 	fmt.Printf("пробуем что-то отправить %v\n", j)
@@ -51,4 +55,5 @@ func send(m data.IMetric, server string) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	janitor.Unlock()
 }
