@@ -20,12 +20,12 @@ func SendMetrics(server string, reportInterval int, pollInterval int) {
 		case g := <-chg10s:
 
 			fmt.Println("отправка gauge ", g.GetName(), " ", g.GetValue())
-			send("gauge", g, server)
+			send(g, server)
 
 		case c := <-chc10s:
 
 			fmt.Println("отправка counter ", c.GetName(), " ", c.GetValue())
-			send("counter", c, server)
+			send(c, server)
 
 		default:
 			time.Sleep(sleepDur)
@@ -33,8 +33,8 @@ func SendMetrics(server string, reportInterval int, pollInterval int) {
 	}
 }
 
-func send(name string, m data.IMetric, server string) {
-	s := fmt.Sprintf("http://%v/update/%v/%v/%v", server, name, m.GetName(), m.GetValue())
+func send(m data.IMetric, server string) {
+	s := fmt.Sprintf("http://%v/value/", server)
 	jsonData, err := json.Marshal(m.ToJSON())
 	if err != nil {
 		fmt.Println(err)
