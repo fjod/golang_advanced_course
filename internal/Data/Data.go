@@ -15,7 +15,7 @@ type IMetric interface {
 	GetStatus() Status
 	GetValue() any
 	GetName() string
-	ToJson() Metrics
+	ToJSON() Metrics
 }
 
 type Gauge struct {
@@ -54,14 +54,14 @@ func (c Counter) GetName() string {
 	return c.Name
 }
 
-func (g Gauge) ToJson() Metrics {
+func (g Gauge) ToJSON() Metrics {
 	return Metrics{
 		ID:    g.Name,
 		Value: &g.Val,
 		MType: "gauge",
 	}
 }
-func (c Counter) ToJson() Metrics {
+func (c Counter) ToJSON() Metrics {
 	return Metrics{
 		ID:    c.Name,
 		Delta: &c.Val,

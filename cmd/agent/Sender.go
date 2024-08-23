@@ -35,7 +35,7 @@ func SendMetrics(server string, reportInterval int, pollInterval int) {
 
 func send(name string, m data.IMetric, server string) {
 	s := fmt.Sprintf("http://%v/update/%v/%v/%v", server, name, m.GetName(), m.GetValue())
-	jsonData, err := json.Marshal(m.ToJson())
+	jsonData, err := json.Marshal(m.ToJSON())
 	if err != nil {
 		fmt.Println(err)
 	}
