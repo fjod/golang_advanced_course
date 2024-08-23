@@ -12,14 +12,11 @@ import (
 
 func Update(c *gin.Context, storage internal.StorageOperations) {
 	var content = c.ContentType()
-	if content == "text/plain" {
-		plainTextUpdate(c, storage)
-	} else if content == "application/json" {
+	if content == "application/json" {
 		jsonUpdate(c, storage)
 	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"err": "bad content type"})
+		plainTextUpdate(c, storage)
 	}
-
 }
 
 func jsonUpdate(c *gin.Context, storage internal.StorageOperations) {
