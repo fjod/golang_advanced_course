@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	internal "github.com/fjod/golang_advanced_course/internal/Data"
 	"math/rand"
 	"runtime"
@@ -18,7 +17,6 @@ func Monitor(intervalSecs int, chg chan<- internal.Gauge, chc chan<- internal.Co
 		select {
 		case <-ticker10.C:
 			{
-				fmt.Println("отправка метрик из Monitor")
 				runtime.ReadMemStats(&rtm)
 				for name, f := range internal.MemMetrics {
 					f(name, rtm, chg)
