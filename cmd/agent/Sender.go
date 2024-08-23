@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/fjod/golang_advanced_course/internal"
 	data "github.com/fjod/golang_advanced_course/internal/Data"
+	"io"
 	"net/http"
 	"time"
 )
@@ -43,8 +44,10 @@ func send(m data.IMetric, server string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = resp.Body.Close()
-	if err != nil {
-		fmt.Println(err)
-	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(resp.Body)
 }
