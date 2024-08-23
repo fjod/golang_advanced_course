@@ -52,7 +52,7 @@ func GetJSON(c *gin.Context, storage internal.StorageOperations) {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err})
 		return
 	}
-	g, err := storage.GetJsonValue(d.ID, d.MType)
+	g, err := storage.GetJSONValue(d.ID, d.MType)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err})
 		return
@@ -60,5 +60,4 @@ func GetJSON(c *gin.Context, storage internal.StorageOperations) {
 
 	gj, _ := json.Marshal(g)
 	c.Data(http.StatusOK, "application/json", gj)
-	return
 }

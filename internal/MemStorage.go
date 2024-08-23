@@ -36,7 +36,7 @@ type StorageOperations interface {
 	KeyExists(string) bool
 	AddOrEdit(any interface{}, name string) error
 	GetValue(name string, metricType string) (string, error)
-	GetJsonValue(name string, metricType string) (internal.Metrics, error)
+	GetJSONValue(name string, metricType string) (internal.Metrics, error)
 	Print() map[string]string
 }
 
@@ -142,7 +142,7 @@ func (r *memStorage) GetValue(name string, metricType string) (string, error) {
 	return "", err
 }
 
-func (r *memStorage) GetJsonValue(name string, metricType string) (internal.Metrics, error) {
+func (r *memStorage) GetJSONValue(name string, metricType string) (internal.Metrics, error) {
 	if metricType == "counter" {
 		c, ok := r.counters.data[name]
 		if ok {
