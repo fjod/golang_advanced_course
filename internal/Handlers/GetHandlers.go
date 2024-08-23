@@ -45,13 +45,18 @@ func Get(c *gin.Context, storage internal.StorageOperations) {
 	c.JSON(http.StatusNotFound, gin.H{"err": err})
 }
 
-func GetJson(c *gin.Context, storage internal.StorageOperations) {
+func GetJSON(c *gin.Context, storage internal.StorageOperations) {
 	var d data.Metrics
 	err := c.ShouldBindJSON(&d)
+	if err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"err": err})
+		return
+	}
 	g, err := storage.GetValue(d.ID, d.MType)
 	if err == nil {
 		gj, _ := json.Marshal(g)
 		c.Data(http.StatusOK, "application/json", gj)
+		return
 	}
 	c.JSON(http.StatusNotFound, gin.H{"err": err})
 }
