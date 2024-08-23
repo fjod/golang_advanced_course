@@ -36,7 +36,7 @@ func main() {
 	router.POST("/update/:type/:name/:value", func(context *gin.Context) {
 		H.Update(context, &storage.StorageOperations)
 	})
-	router.POST("/value/:type/:name", func(context *gin.Context) {
+	router.POST("/value", func(context *gin.Context) {
 		H.GetJSON(context, &storage.StorageOperations)
 	})
 	router.GET("/value/:type/:name", func(context *gin.Context) {
