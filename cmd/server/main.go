@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/fjod/golang_advanced_course/internal"
+	H "github.com/fjod/golang_advanced_course/internal/Handlers"
 	MW "github.com/fjod/golang_advanced_course/internal/middlewares"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -33,13 +34,16 @@ func main() {
 	router.Use(MW.ResponseLogger(sugar))
 
 	router.POST("/update/:type/:name/:value", func(context *gin.Context) {
-		internal.Update(context, &storage.StorageOperations)
+		H.Update(context, &storage.StorageOperations)
+	})
+	router.POST("/value/:type/:name", func(context *gin.Context) {
+		H.GetJson(context, &storage.StorageOperations)
 	})
 	router.GET("/value/:type/:name", func(context *gin.Context) {
-		internal.Get(context, &storage.StorageOperations)
+		H.Get(context, &storage.StorageOperations)
 	})
 	router.GET("", func(context *gin.Context) {
-		internal.HTML(context, &storage.StorageOperations)
+		H.HTML(context, &storage.StorageOperations)
 	})
 	err = router.Run(server)
 	if err != nil {
