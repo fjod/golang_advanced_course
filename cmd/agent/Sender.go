@@ -48,7 +48,7 @@ const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	}
 */
 func send2(m data.IMetric, server string) {
-
+	fmt.Printf(time.DateTime)
 	s := fmt.Sprintf("http://%v/update/", server)
 	var j = m.ToJSON()
 	jsonData, err := json.Marshal(j)

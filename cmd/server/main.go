@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"os"
+	"time"
 )
 
 var storage = internal.NewStorage()
@@ -48,6 +49,8 @@ func main() {
 	router.GET("", func(context *gin.Context) {
 		H.HTML(context, &storage.StorageOperations)
 	})
+	fmt.Printf("server started now")
+	fmt.Printf(time.DateTime)
 	err = router.Run(server)
 	if err != nil {
 		fmt.Println("router dead", err)
