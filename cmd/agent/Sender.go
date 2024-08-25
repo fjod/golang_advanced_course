@@ -62,6 +62,7 @@ func send2(m data.IMetric, server string) {
 		// whatever
 		fmt.Printf("ошибка client.Do \n")
 		fmt.Println(err)
+		return
 	}
 
 	response, err := ioutil.ReadAll(resp.Body)
