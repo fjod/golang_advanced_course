@@ -59,7 +59,8 @@ func GetJSON(c *gin.Context, storage internal.StorageOperations) {
 		fmt.Printf("got %v \n", g)
 		d.Delta = nil
 		d.Value = nil
-		c.JSON(http.StatusNotFound, d)
+		notFoundObj, _ := json.Marshal(d)
+		c.Data(http.StatusNotFound, "application/json", notFoundObj)
 		return
 	}
 
