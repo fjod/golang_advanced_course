@@ -49,7 +49,8 @@ func GetJSON(c *gin.Context, storage internal.StorageOperations) {
 	var d data.Metrics
 	err := c.ShouldBindJSON(&d)
 	if err != nil {
-		c.JSON(http.StatusAccepted, gin.H{"err": err})
+		fmt.Printf("ShouldBindJSON err %v \n", d)
+		c.JSON(http.StatusBadRequest, gin.H{"err": err})
 		return
 	}
 	g, err := storage.GetJSONValue(d.ID, d.MType)
