@@ -36,6 +36,7 @@ type StorageOperations interface {
 	KeyExists(string) bool
 	AddOrEdit(any interface{}, name string) error
 	GetValue(name string, metricType string) (string, error)
+	GetJSONValue(name string, metricType string) (internal.Metrics, error)
 	Print() map[string]string
 }
 
@@ -139,6 +140,30 @@ func (r *memStorage) GetValue(name string, metricType string) (string, error) {
 	}
 	err := fmt.Errorf("key not found or not supported type")
 	return "", err
+}
+
+func (r *memStorage) GetJSONValue(name string, metricType string) (internal.Metrics, error) {
+	if metricType == "counter" {
+		c, ok := r.counters.data[name]
+		if ok {
+			return internal.Metrics{
+				ID:    c.Name,
+				Delta: &c.Val,
+				MType: "counter",
+			}, nil
+		}
+	} else if metricType == "gauge" {
+		g, ok := r.gauges.data[name]
+		if ok {
+			return internal.Metrics{
+				ID:    g.Name,
+				Value: &g.Val,
+				MType: "gauge",
+			}, nil
+		}
+	}
+	err := fmt.Errorf("key not found or not supported type")
+	return internal.Metrics{}, err
 }
 
 func (r *memStorage) Print() map[string]string {
