@@ -144,17 +144,11 @@ func (r *memStorage) GetValue(name string, metricType string) (string, error) {
 
 func (r *memStorage) GetJSONValue(name string, metricType string) (internal.Metrics, error) {
 	if metricType == "counter" {
-		fmt.Printf("запрос счетчика name %v \n", name)
-
-		for s := range r.counters.data {
-			fmt.Println(s)
-		}
-		fmt.Printf("counters amount is %v\n", len(r.counters.data))
 		c, ok := r.counters.data[name]
 		if ok {
 			return internal.Metrics{
 				ID:    c.Name,
-				Delta: c.Val,
+				Delta: &c.Val,
 				MType: "counter",
 			}, nil
 		}
@@ -163,7 +157,7 @@ func (r *memStorage) GetJSONValue(name string, metricType string) (internal.Metr
 		if ok {
 			return internal.Metrics{
 				ID:    g.Name,
-				Value: g.Val,
+				Value: &g.Val,
 				MType: "gauge",
 			}, nil
 		}
