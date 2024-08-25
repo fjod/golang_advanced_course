@@ -63,6 +63,7 @@ func jsonUpdate(c *gin.Context, storage internal.StorageOperations) {
 
 		c.JSON(http.StatusBadRequest, gin.H{"err": "unknown type"})
 	}
+	fmt.Println("ошибка ShouldBindJSON", err)
 	c.JSON(http.StatusBadRequest, gin.H{"err": err})
 }
 

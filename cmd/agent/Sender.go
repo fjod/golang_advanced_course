@@ -53,7 +53,6 @@ func send2(m data.IMetric, server string) {
 	var j = m.ToJSON()
 	jsonData, err := json.Marshal(j)
 	client := &http.Client{}
-	fmt.Printf("пробуем что-то отправить %v\n", j)
 	req, err := http.NewRequest("POST", s, bytes.NewBuffer(jsonData))
 	req.Close = true
 	req.Header.Set("Content-Type", "application/json")
@@ -65,14 +64,13 @@ func send2(m data.IMetric, server string) {
 		return
 	}
 
-	response, err := ioutil.ReadAll(resp.Body)
+	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		// Whatever
 		fmt.Printf("ошибка ioutil.ReadAll \n")
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(response)
 
 	err = resp.Body.Close()
 	if err != nil {
