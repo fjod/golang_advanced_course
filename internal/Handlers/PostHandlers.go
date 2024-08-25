@@ -56,7 +56,9 @@ func jsonUpdate(c *gin.Context, storage internal.StorageOperations) {
 				c.JSON(http.StatusBadRequest, gin.H{"err": err2})
 				return
 			}
-			gj, _ := json.Marshal(metricValue)
+			i, _ := strconv.ParseInt(metricValue, 10, 64)
+			d.Delta = &i
+			gj, _ := json.Marshal(d)
 			c.Data(http.StatusOK, "application/json", gj)
 			return
 		}
