@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/fjod/golang_advanced_course/internal"
 	data "github.com/fjod/golang_advanced_course/internal/Data"
-	"math/rand"
+	"io/ioutil"
 	"net/http"
 	"sync"
 	"time"
@@ -23,11 +23,11 @@ func SendMetrics(server string, reportInterval int, pollInterval int) {
 		select {
 		case g := <-chg10s:
 			fmt.Println("отправка gauge ", g.GetName(), " ", g.GetValue())
-			send(g, server)
+			send2(g, server)
 
 		case c := <-chc10s:
 			fmt.Println("отправка counter ", c.GetName(), " ", c.GetValue())
-			send(c, server)
+			send2(c, server)
 
 		default:
 			time.Sleep(sleepDur)
@@ -35,17 +35,51 @@ func SendMetrics(server string, reportInterval int, pollInterval int) {
 	}
 }
 
+/*
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-func generateRandomString(length int) string {
-	rand.Seed(time.Now().UnixNano())
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))]
+	func generateRandomString(length int) string {
+		rand.Seed(time.Now().UnixNano())
+		b := make([]byte, length)
+		for i := range b {
+			b[i] = charset[rand.Intn(len(charset))]
+		}
+		return string(b)
 	}
-	return string(b)
+*/
+func send2(m data.IMetric, server string) {
+
+	s := fmt.Sprintf("http://%v/update/", server)
+	var j = m.ToJSON()
+	jsonData, err := json.Marshal(j)
+	client := &http.Client{}
+	fmt.Printf("пробуем что-то отправить %v\n", j)
+	req, err := http.NewRequest("POST", s, bytes.NewBuffer(jsonData))
+	req.Close = true
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		// whatever
+		fmt.Printf("ошибка client.Do \n")
+		fmt.Println(err)
+	}
+
+	response, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// Whatever
+		fmt.Printf("ошибка ioutil.ReadAll \n")
+		fmt.Println(err)
+	}
+	fmt.Println(response)
+
+	err = resp.Body.Close()
+	if err != nil {
+		fmt.Printf("ошибка Close")
+		fmt.Println(err)
+	}
 }
 
+/*
 func send(m data.IMetric, server string) {
 	janitor.Lock()
 	code := generateRandomString(10)
@@ -74,3 +108,4 @@ func send(m data.IMetric, server string) {
 	}
 	janitor.Unlock()
 }
+*/
